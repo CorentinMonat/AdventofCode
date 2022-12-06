@@ -14,6 +14,7 @@ data = open("day6.txt").read()
 n = 0
 for i in range(14,len(data)):
     print('find a better way!')
+    #Salut 
     # MOST efficient way to solve this:    
     # if data[i-14] != data[i-13]:
     #     if data[i-14] != data[i-12]:
