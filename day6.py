@@ -6,16 +6,16 @@ data = open("day6.txt").read()
 # data = 'zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw'
 
 # Part 1
-# for i in range(0,len(data)):  
-#         if i>=4 and  data[i-1] != data[i-2] and data[i-1]!= data[i-3] and data[i-1] != data[i-4] and data[i-2] != data[i-3] and data[i-2] != data[i-4] and data[i-3] != data[i-4]:
-#             break
+for i in range(0,len(data)):  
+        if i>=4 and  data[i-1] != data[i-2] and data[i-1]!= data[i-3] and data[i-1] != data[i-4] and data[i-2] != data[i-3] and data[i-2] != data[i-4] and data[i-3] != data[i-4]:
+            answer1 = i
+            break
         
 # Part 2
 n = 0
 for i in range(14,len(data)):
     print('find a better way!')
-    #Salut 
-    # MOST efficient way to solve this:    
+    # MOST efficient way to solve this:   (less efficient way below this disasterpiece)  
     # if data[i-14] != data[i-13]:
     #     if data[i-14] != data[i-12]:
     #         if data[i-14] != data[i-11]:
