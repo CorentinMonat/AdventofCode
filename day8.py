@@ -1,4 +1,3 @@
-import re
 import numpy as np
 data = open("day8.txt").read().splitlines()
 # data = ['30373', '25512', '65332', '33549', '35390']
