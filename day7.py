@@ -1,65 +1,46 @@
-import re
-# data = open("day7.txt").read().splitlines()
-data = ['$ cd /', '$ ls', 'dir a', '14848514 b.txt', '8504156 c.dat', 'dir d', '$ cd a', '$ ls', 'dir e', '29116 f', '2557 g', '62596 h.lst', '$ cd e', '$ ls', '584 i', '$ cd ..', '$ cd ..', '$ cd d', '$ ls', '4060174 j', '8033020 d.log', '5626152 d.ext', '7214296 k']
+import os
+data = open("day7.txt").read().splitlines()
+# data = ['$ cd /', '$ ls', 'dir a', '14848514 b.txt', '8504156 c.dat', 'dir d', '$ cd a', '$ ls', 'dir e', '29116 f', '2557 g', '62596 h.lst', '$ cd e', '$ ls', '584 i', '$ cd ..', '$ cd ..', '$ cd d', '$ ls', '4060174 j', '8033020 d.log', '5626152 d.ext', '7214296 k']
 
-# Make class to have one list per path to a folder
-class Stack():
-    
-    def __init__(self):
-        self.path = []
-    
-    def push(self, item):
-        self.path.append(item)
-        
-    def pop(self):
-        if len(self.path):
-            self.path.pop()
-        else:
-            return None    
-    
-# Find how many folders there are. (to later fill lists with each folder's path)
-numberOfFolders = 1
-for i in range(len(data)):
-    if "dir" in data[i]:
-        numberOfFolders += 1
-       
-folderPaths = [[]] * numberOfFolders
-# Find path of each folder
-for j in range(0,numberOfFolders):
-    folderPaths[j] = Stack()
-    n = 0
-    for i in range(0,len(data)):
-        if "$ cd " in data[i]:
-            folderPaths[j].push(data[i])
-            # print('adding', folderPaths[j].path[-1])
-            n += 1
+# Part 1
+current_path = "/"
+folders_with_files = {}
+# Find path of each folder, and add files and directories of each folder
+for line in data:
+    if "$ cd " in line:
+        current_path = os.path.realpath(os.path.join(current_path, line[4:].strip()))
+        if not current_path in folders_with_files:
+            folders_with_files[current_path] = {'files' : [], 'directories' : []}
+    elif "dir" in line:
+        folders_with_files[current_path]['directories'].append(line[4:].strip())
             
-        if "$ cd .." in data[i]:
-            # print('removing', folderPaths[j].path[-1])
-            folderPaths[j].pop()
-            # print('removing', folderPaths[j].path[-1])
-            folderPaths[j].pop()
-            n -= 1
-        
-        if n == j+1:
-            # print(n)
-            # print('going to next folder path')
-            break    
-    print(folderPaths[j].path)    
-        
-# Find how many files there are
-numberOfFiles = 0
-# if there is an integer in str, it is a file
-for i in range(0,len(data)):
-    if len([int(s) for s in re.findall(r'\b\d+\b', data[i])]):
-        numberOfFiles += 1
-        
-# Find path of each file
-# count how many elements between each cd, then you know what is in each folder
-filePaths = [[]] * numberOfFiles
-for j in range(0,1):
-    filePaths[j] = Stack()
-    m = 0
-    for i in range(0,len(data)):
-        if "cd" in data[i]:
-            filePaths[j].push(data[i])
+    elif line[0] in "0123456789":
+        size, name = line.split()
+        folders_with_files[current_path]['files'].append([int(size), name])
+
+# directories = {directory: 1 for directory in folders_with_files}
+def get_directory_size(folders_with_files, directory):
+    files = folders_with_files[directory]['files']
+    subdir = folders_with_files[directory]['directories']
+    
+    sum_files = sum(file[0] for file in files)
+    sum_subdir = sum([get_directory_size(folders_with_files, os.path.join(directory, subdirect)) for subdirect in subdir])
+    
+    return sum_files + sum_subdir
+
+
+size_of_each_dir = {dirs: get_directory_size(folders_with_files, dirs) for dirs in folders_with_files}
+
+part1 = []
+for d in size_of_each_dir:
+    if size_of_each_dir[d] < 100000:
+        part1.append(size_of_each_dir[d])
+
+answer1 = sum(part1)
+print(answer1)
+
+# Part 2
+needed_space = 41035571 - 40000000
+answer2 = min([size_of_each_dir[d] for d in size_of_each_dir if needed_space < size_of_each_dir[d]])
+print(answer2)
+
